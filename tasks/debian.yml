@@ -1,0 +1,45 @@
+- name: check immortal {{ immortal_version}} version
+  command: /usr/bin/immortal -v
+  register: immortal_version_check
+  ignore_errors: yes
+  changed_when: no
+- set_fact:
+    should_update_immortal: "{{ (immortal_version_check | failed) or not(immortal_version_check.stdout | search(immortal_version)) }}"
+
+- name: check if systemctl is on the system
+  stat: path="/bin/systemctl"
+  register: systemd
+  ignore_errors: true
+
+- block:
+    - name: download immortal "{{ immortal_version }}"
+      get_url:
+        url: "https://github.com/immortal/immortal/releases/download/{{ immortal_version }}/immortal_{{ immortal_version }}_amd64.deb"
+        dest: "/tmp/immortal-{{ immortal_version }}.deb"
+        checksum: "{{ immortal_checksum }}"
+
+    - name: Install immortal "{{ immortal_version }}"
+      apt: deb="/tmp/immortal-{{ immortal_version }}.deb"
+  when: should_update_immortal
+
+- name: create immortal services directory
+  file: path=/etc/immortal state=directory
+
+- name: create immortaldir.service
+  template:
+    src: immortaldir.service
+    dest: /etc/systemd/system/immortaldir.service
+  when: systemd.stat.exists
+
+- name: create start-stop-daemon script
+  template:
+    src: immortaldir.j2
+    dest: /etc/init.d/immortaldir
+    mode: 0755
+  when: not systemd.stat.exists
+
+- name: start immortaldir
+  service:
+    name: immortaldir
+    state: started
+    enabled: yes

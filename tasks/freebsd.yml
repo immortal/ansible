@@ -1,0 +1,9 @@
+---
+- name: install immortal
+  pkgng: name=immortal state=present
+
+- name: start immortaldir on boot time
+  service:
+    name: immortaldir
+    state: running
+    enabled: yes
