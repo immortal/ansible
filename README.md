@@ -12,5 +12,5 @@ used, example:
 ```
 
 The current role only working for [FreeBSD](https://freebsd.org) and
-[Debian](https://www.debian.org/derivatives/) based Linux operating systems,
-help improving is more than welcome.
+[Debian](https://www.debian.org/derivatives/) * RPM based Linux operating
+systems, help improving is more than welcome.
