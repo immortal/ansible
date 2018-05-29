@@ -1,0 +1,30 @@
+- name: check if /usr/bin/immortal exists
+  stat:
+    path: /usr/bin/immortal
+  register: immortal_bin
+
+- block:
+    - name: download immortal
+      shell: curl -s https://packagecloud.io/install/repositories/immortal/immortal/script.deb.sh | bash
+
+    - name: Install immortal
+      apt:
+        name: immortal
+        update_cache: yes
+  when: not immortal_bin.stat.exists and ansible_os_family == "Debian"
+
+- block:
+    - name: download immortal
+      shell: curl -s https://packagecloud.io/install/repositories/immortal/immortal/script.rpm.sh | bash
+
+    - name: Install immortal
+      apt:
+        name: immortal
+        update_cache: yes
+  when: not immortal_bin.stat.exists and ansible_os_family == "RedHat"
+
+- name: start immortaldir
+  service:
+    name: immortaldir
+    state: started
+    enabled: yes

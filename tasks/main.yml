@@ -1,9 +1,9 @@
 ---
-- include_tasks: freebsd.yml
+- import_tasks: freebsd.yml
   when: ansible_os_family == "FreeBSD"
   tags:
     - immortal
-- include_tasks: debian.yml
-  when: ansible_os_family == "Debian"
+- import_tasks: linux.yml
+  when: ansible_os_family != "FreeBSD"
   tags:
     - immortal
